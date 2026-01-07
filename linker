@@ -1,0 +1,160 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+script_dir=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)
+repo_config="$script_dir/.config"
+
+if [ ! -d "$repo_config" ]; then
+  echo "missing $repo_config" >&2
+  exit 1
+fi
+
+timestamp=$(date +%Y%m%d%H%M%S)
+
+backup_path() {
+  local target=$1
+
+  if [ -e "$target" ] || [ -L "$target" ]; then
+    mv "$target" "${target}.bak-$timestamp"
+  fi
+}
+
+link_path() {
+  local src=$1
+  local dest=$2
+  local current_link
+
+  if [ -L "$dest" ]; then
+    current_link=$(readlink "$dest" || true)
+    if [ "$current_link" = "$src" ]; then
+      return 0
+    fi
+  fi
+
+  if [ -e "$dest" ] || [ -L "$dest" ]; then
+    backup_path "$dest"
+  fi
+
+  ln -s "$src" "$dest"
+}
+
+mkdir -p "$HOME/.config"
+
+prompt_yes_no() {
+  local prompt=$1
+  local response
+
+  while true; do
+    read -r -p "$prompt [y/n]: " response
+    case "$response" in
+      y|Y)
+        return 0
+        ;;
+      n|N)
+        return 1
+        ;;
+      *)
+        echo "Please answer y or n."
+        ;;
+    esac
+  done
+}
+
+echo "Select configs to link from $repo_config:"
+for entry in "$repo_config"/*; do
+  entry_name=$(basename "$entry")
+  case "$entry_name" in
+    fish)
+      if ! command -v fish >/dev/null 2>&1; then
+        echo "skip $entry_name (fish not installed)"
+        continue
+      fi
+      ;;
+    alacritty)
+      if ! command -v alacritty >/dev/null 2>&1; then
+        echo "skip $entry_name (alacritty not installed)"
+        continue
+      fi
+      ;;
+    kitty)
+      if ! command -v kitty >/dev/null 2>&1; then
+        echo "skip $entry_name (kitty not installed)"
+        continue
+      fi
+      ;;
+  esac
+
+  if [ "$entry_name" = "audacious" ]; then
+    src="$entry/config"
+    dest_dir="$HOME/.config/audacious"
+    dest="$dest_dir/config"
+    if [ -e "$src" ]; then
+      if prompt_yes_no "Link $src -> $dest?"; then
+        mkdir -p "$dest_dir"
+        link_path "$src" "$dest"
+      else
+        echo "skip $entry_name"
+      fi
+    else
+      echo "skip $entry_name (missing $src)"
+    fi
+    skin_src="$entry/lainampborders"
+    skin_dest="$HOME/.local/share/audacious/Skins/lainampborders"
+    if [ -d "$skin_src" ]; then
+      if prompt_yes_no "Link $skin_src -> $skin_dest?"; then
+        mkdir -p "$(dirname "$skin_dest")"
+        link_path "$skin_src" "$skin_dest"
+      else
+        echo "skip $entry_name lainampborders"
+      fi
+    else
+      echo "skip $entry_name (missing $skin_src)"
+    fi
+    continue
+  fi
+
+  dest="$HOME/.config/$entry_name"
+  if prompt_yes_no "Link $entry -> $dest?"; then
+    link_path "$entry" "$dest"
+  else
+    echo "skip $entry_name"
+  fi
+done
+
+dotfiles=(
+  .aliases
+  .profile
+  .zshrc
+)
+
+echo "Select dotfiles to link into $HOME:"
+for dotfile in "${dotfiles[@]}"; do
+  src="$script_dir/$dotfile"
+  dest="$HOME/$dotfile"
+  if [ -e "$src" ]; then
+    if prompt_yes_no "Link $src -> $dest?"; then
+      link_path "$src" "$dest"
+    else
+      echo "skip $dotfile"
+    fi
+  fi
+done
+
+local_files=(
+  ".local/bin/obsidian"
+  ".local/share/applications/obsidian.desktop"
+)
+
+echo "Select local files to link into $HOME/.local:"
+for local_file in "${local_files[@]}"; do
+  src="$script_dir/$local_file"
+  dest="$HOME/$local_file"
+  if [ -e "$src" ]; then
+    if prompt_yes_no "Link $src -> $dest?"; then
+      mkdir -p "$(dirname "$dest")"
+      link_path "$src" "$dest"
+    else
+      echo "skip $local_file"
+    fi
+  fi
+done

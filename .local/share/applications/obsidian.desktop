@@ -1,0 +1,8 @@
+[Desktop Entry]
+Type=Application
+Name=Obsidian
+Exec=obsidian %u
+Icon=obsidian
+Categories=Office;Utility;
+Terminal=false
+StartupWMClass=obsidian

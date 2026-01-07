@@ -1,0 +1,20 @@
+.config/vesktop/sessionData/
+.config/vesktop/Crashpad/
+.config/vesktop/SingletonCookie
+.config/vesktop/SingletonLock
+.config/vesktop/SingletonSocket
+.config/vesktop/state.json
+.config/vesktop/Cache/
+.config/vesktop/Code Cache/
+.config/vesktop/GPUCache/
+.config/vesktop/blob_storage/
+.config/vesktop/Dictionaries/
+.config/vesktop/Local Storage/
+.config/vesktop/Partitions/
+.config/vesktop/Service Worker/
+.config/vesktop/Shared Dictionary/
+.config/vesktop/SharedStorage/
+.config/vesktop/Network/
+.config/vesktop/databases/
+.config/vesktop/IndexedDB/
+.config/vesktop/logs/

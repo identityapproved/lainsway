@@ -1,0 +1,11 @@
+{
+    "discordBranch": "stable",
+    "minimizeToTray": true,
+    "arRPC": true,
+    "splashColor": "rgb(160, 89, 105)",
+    "splashBackground": "rgb(0, 0, 0)",
+    "clickTrayToShowHide": true,
+    "disableMinSize": true,
+    "disableSmoothScroll": true,
+    "enableTaskbarFlashing": true
+}

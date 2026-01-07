@@ -1,0 +1,251 @@
+$bg: #000000;
+$bg-alt: #1A1A1A;
+$bg-strong: #2A2A2A;
+$fg: #CE7688;
+$fg-dim: #965363;
+$fg-dark: #5D333C;
+$accent: #C1B48E;
+$accent-dim: #7A7158;
+
+@keyframes fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+* {
+  all: unset;
+  animation: fade-in 0.6s ease-out;
+  font-family: "Iosevka Nerd Font", "Iosevka", monospace;
+  color: $fg;
+  font-size: 15px;
+}
+
+.bar {
+  background-color: $bg;
+  background-image:
+    repeating-linear-gradient(
+      90deg,
+      transparent 0,
+      transparent 2px,
+      rgba(255, 255, 255, 0.08) 3px
+    ),
+    repeating-linear-gradient(
+      0deg,
+      transparent 0,
+      transparent 3px,
+      rgba(255, 255, 255, 0.06) 4px
+    );
+  padding: 2px 10px 2px 0;
+  border-bottom: 1px solid $fg-dark;
+}
+
+.sidestuff {
+  padding: 1px 0;
+}
+
+.time {
+  color: $accent;
+  padding-left: 8px;
+}
+
+.player {
+  padding: 0 10px;
+}
+
+.player-text {
+  color: $fg-dim;
+  font-size: 13px;
+}
+
+.window-title {
+  color: $fg-dim;
+  font-size: 14px;
+  padding: 0 10px;
+}
+
+.sysmon {
+  margin-left: 23px;
+  font-size: 18px;
+  padding: 0.2rem 0.4rem;
+  border: 2px solid $accent;
+  border-radius: 6px;
+}
+
+.sysmon-items {
+  margin-right: 0.2rem;
+}
+
+.sysmon-toggle {
+  font-size: 16px;
+  padding: 0.1rem 0.3rem;
+  color: $accent-dim;
+}
+
+.sysmon-item {
+  font-size: 18px;
+  padding-right: 6px;
+  margin: 0;
+  color: $accent;
+}
+
+.sysmon label {
+  font-size: 18px;
+}
+
+.sysmon-popup {
+  background-color: $bg-alt;
+  padding: 0.4rem;
+  border-radius: 6px;
+  font-size: 12px;
+}
+
+.calendar-popup {
+  background-color: $bg-alt;
+  padding: 0.7rem 0rem 0rem 0rem;
+  border-radius: 6px;
+  border: 2px solid $fg-dark;
+  font-size: 12px;
+}
+
+.ram-popup {
+  background-color: $bg-alt;
+  padding: 0.5rem;
+  border-radius: 6px;
+  font-size: 13px;
+}
+
+.vol-muted {
+  font-size: 18px;
+  padding: 0.4rem 0.5rem 0.4rem 0.4rem;
+  margin: 0rem 0.2rem 0rem 0.2rem;
+  border: 2px solid;
+  color: $fg-dark;
+  border-color: $fg-dark;
+}
+
+.vol-low {
+  font-size: 18px;
+  padding: 0.4rem 0.5rem 0.4rem 0.4rem;
+  margin: 0rem 0.2rem 0rem 0.2rem;
+  border: 2px solid;
+  color: $accent-dim;
+  border-color: $accent-dim;
+}
+
+.vol-medium {
+  font-size: 18px;
+  padding: 0.4rem 0.5rem 0.4rem 0.4rem;
+  margin: 0rem 0.2rem 0rem 0.2rem;
+  border: 2px solid;
+  color: $accent;
+  border-color: $accent;
+}
+
+.vol-high {
+  font-size: 18px;
+  padding: 0.4rem 0.5rem 0.4rem 0.4rem;
+  margin: 0rem 0.2rem 0rem 0.2rem;
+  border: 2px solid;
+  color: $fg;
+  border-color: $fg;
+}
+
+.ram-low,
+.ram-medium,
+.ram-high {
+  font-size: 18px;
+  padding-right: 6px;
+  margin: 0;
+}
+
+.ram-low {
+  color: $accent;
+}
+
+.ram-medium {
+  color: $accent-dim;
+}
+
+.ram-high {
+  color: $fg;
+}
+
+.power-saver,
+.balanced,
+.performance {
+  font-size: 13px;
+  padding: 0.4rem 0.5rem 0.4rem 0.4rem;
+  margin: 0rem 0.2rem 0rem 0.2rem;
+  border: 2px solid;
+}
+
+.power-saver {
+  color: $accent-dim;
+  border-color: $accent-dim;
+}
+
+.balanced {
+  color: $accent;
+  border-color: $accent;
+}
+
+.performance {
+  color: $fg;
+  border-color: $fg;
+}
+
+.poweroff,
+.logout {
+  font-size: 13px;
+  padding: 0.4rem 0.66rem 0.4rem 0.65rem;
+  margin: 0rem 0.2rem 0rem 0.2rem;
+  border: 2px solid;
+  border-radius: 5px;
+  transition: background 0.2s, color 0.2s;
+}
+
+.powermenu button:first-child {
+  margin-left: 0;
+}
+
+.poweroff {
+  color: $fg;
+  border-color: $fg;
+}
+
+.logout {
+  color: $fg-dim;
+  border-color: $fg-dim;
+}
+
+.poweroff:hover {
+  background-color: $fg;
+  color: $bg;
+}
+
+.logout:hover {
+  background-color: $fg-dim;
+  color: $bg;
+}
+
+.ws-btn,
+.ws-active {
+  font-size: 10px;
+  padding: 0.4rem;
+  margin: 0rem -1rem 0rem 0.8rem;
+  color: $fg-dim;
+  border: 2px solid $fg-dim;
+  border-radius: 6px;
+  transition: background 0.2s, color 0.2s;
+}
+
+.ws-btn:hover {
+  background-color: $fg;
+  color: $bg;
+  border-color: $fg;
+}
+
+.ws-active {
+  background-color: $fg-dim;
+  color: $bg;
+}

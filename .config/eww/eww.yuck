@@ -1,0 +1,130 @@
+;; Eww config for sway (single bar)
+;; Monitor name matches eww monitor list: SyncMaster / C27R50x
+
+(defwidget bar []
+  (centerbox :class "bar" :orientation "h"
+    (leftstuff :hexpand true)
+    (label :class "window-title" :halign "center" :text active_title)
+    (rightstuff :hexpand true)))
+
+(defvar sysmon_enabled true)
+
+(defwidget rightstuff []
+  (box :class "sidestuff" :orientation "h" :space-evenly false :halign "end"
+    (powerbtn)
+    (vol)
+    (player)
+    (eventbox
+      :onhover "eww open calendar_popup"
+      :onhoverlost "eww close calendar_popup"
+      (label :class "time" :text bar_time))))
+
+(defwidget leftstuff []
+  (box :class "sidestuff" :orientation "h" :space-evenly false :halign "start"
+    (powermenu)
+    (workspaces)
+    (sysmon)))
+
+(defwidget vol []
+  (label :class volume_class :text volume_ascii))
+
+(defwidget ram []
+  (label :class ram_class :text ram_ascii :tooltip ram_percent))
+
+(defwidget powerbtn []
+  (button
+    :onclick "scripts/cycle_power_profile.sh"
+    (label :class power_profile :text power_profile)))
+
+(defwidget powermenu []
+  (box :orientation "h" :class "powermenu"
+    (button :class "poweroff" :onclick "systemctl poweroff"
+      (label :text ""))
+    (button :class "logout" :onclick "swaymsg exit"
+      (label :text "󰍃"))))
+
+(defwidget workspaces []
+  (box :class "workspaces" :orientation "h" :halign "start" :spacing 8
+    (for ws in ws_state
+      (button :class {ws.class} :visible {ws.visible} :onclick "swaymsg workspace ${ws.num}"
+        (label :text "${ws.num}")))))
+
+(defwidget sysmon []
+  (box :class "sysmon" :orientation "h" :space-evenly false
+    (eventbox
+      :visible sysmon_enabled
+      :onclick "scripts/toggle-sysmon.sh"
+      (box :class "sysmon-items" :orientation "h" :space-evenly false
+        (label :class "sysmon-item" :text {
+          sysmon_mode == "percent" ? "󰻠 ${cpu_percent}%" : cpu_ascii
+        })
+        (label :class ram_class :text {
+          sysmon_mode == "percent" ? "󰍛 ${ram_percent}" : ram_ascii
+        })
+        (label :class "sysmon-item" :text {
+          sysmon_mode == "percent" ? "󰋊 ${disk_percent}%" : disk_ascii
+        })
+        (label :class "sysmon-item" :text "󰈐${fan_rpm}RPM")
+        (label :class "sysmon-item" :text "T${temp_c}°C")))
+    (button :class "sysmon-toggle" :onclick "scripts/toggle-sysmon-enabled.sh"
+      (label :text { sysmon_enabled ? "⏸" : "▶" }))))
+
+
+(defwidget player []
+  (box :class "player" :orientation "h" :space-evenly false
+    (label :class "player-text" :text {
+      player_status == "playing" || player_status == "paused"
+        ? "${player_artist} — ${player_title}"
+        : ""
+    })))
+
+(defpoll volume_ascii :interval "1s" "scripts/getvolumeascii.sh")
+(defpoll volume_class :interval "1s" "scripts/getvolumeclass.sh")
+(defpoll ram_ascii :interval "1s" :run-while sysmon_enabled "scripts/getramascii.sh")
+(defpoll ram_percent :interval "2s" :run-while sysmon_enabled "scripts/getrampercent.sh")
+(defpoll ram_class :interval "2s" :run-while sysmon_enabled "scripts/getramclass.sh")
+(defpoll power_profile :interval "5s" "scripts/get_power_profile.sh")
+(defpoll cpu_ascii :interval "2s" :run-while sysmon_enabled "scripts/getcpuascii.sh")
+(defpoll disk_ascii :interval "5s" :run-while sysmon_enabled "scripts/getdiskascii.sh")
+(defpoll cpu_percent :interval "2s" :run-while sysmon_enabled "scripts/getcpupercent.sh")
+(defpoll disk_percent :interval "5s" :run-while sysmon_enabled "scripts/getdiskpercent.sh")
+(defpoll fan_rpm :interval "5s" :run-while sysmon_enabled "scripts/getfanrpm.sh")
+(defpoll temp_c :interval "5s" :run-while sysmon_enabled "scripts/gettempc.sh")
+
+
+(deflisten ws_state "scripts/subscribe_ws_state.sh")
+
+(defpoll bar_time :interval "10s" "date '+%H:%M 󰃭 %-d.%-m.%Y'")
+(defpoll calendar_text :interval "1h" "cal -m")
+(defpoll active_title :interval "2s" "swaymsg -t get_tree -r | jq -r '.. | select(.focused? == true) | .name' | head -n 1")
+
+(defpoll player_status :interval "2s" "scripts/player-status.sh")
+(defpoll player_title :interval "2s" "scripts/player-title.sh")
+(defpoll player_artist :interval "2s" "scripts/player-artist.sh")
+
+(defvar sysmon_mode "bar")
+
+(defwindow bar
+  :monitor "C27R50x"
+  :stacking "fg"
+  :windowtype "dock"
+  :exclusive true
+  :geometry (geometry
+    :anchor "top center"
+    :x "0%"
+    :y "0px"
+    :width "100%"
+    :height "28px")
+  (bar))
+
+(defwindow calendar_popup
+  :monitor "C27R50x"
+  :stacking "fg"
+  :exclusive false
+  :geometry (geometry
+    :anchor "top right"
+    :x "20px"
+    :y "38px"
+    :width "240px")
+  (box :class "calendar-popup"
+    (label :text calendar_text)))
