@@ -1,0 +1,58 @@
+[opener]
+zathura = [
+  { run = 'zathura "$@"', orphan = true, desc = "Zathura" }
+]
+video = [
+  { run = 'mpv "$1"', orphan = true, desc = "mpv" },
+]
+
+[open]
+# `prepend_rules`, not a bare `rules`: `rules` REPLACES yazi's whole default
+# list, taking the folder, text, image, archive and `*` fallback rules with it.
+#
+# Glob rules key on `url`, not `name`. yazi does not warn on an unknown key,
+# so a `name = "*.pdf"` rule is silently dead — verified against the defaults
+# compiled into yazi 26.
+#
+# zathura reads every document type below, no second opener needed:
+#   zathura-pdf-mupdf   pdf, epub, mobi, fb2, xps/oxps
+#   zathura-cb          cbz, cbr, cb7, cbt (via libarchive)
+#   zathura-djvu        djvu
+#   zathura-ps          ps, eps
+prepend_rules = [
+  { mime = "application/pdf", use = [ "zathura" ] },
+  { mime = "application/postscript", use = [ "zathura" ] },
+  { mime = "application/epub+zip", use = [ "zathura" ] },
+  { mime = "application/x-mobipocket-ebook", use = [ "zathura" ] },
+  { mime = "application/x-fictionbook*", use = [ "zathura" ] },
+  { mime = "image/vnd.djvu*", use = [ "zathura" ] },
+
+  # Comic archives report as application/zip or application/x-rar, which the
+  # default archive rule would otherwise claim, so match them by extension
+  # ahead of it.
+  { url = "*.{cbz,cbr,cb7,cbt}", use = [ "zathura" ] },
+  { url = "*.{pdf,ps,eps,epub,mobi,fb2,djvu,xps,oxps}", use = [ "zathura" ] },
+
+  { mime = "{audio,video}/*", use = [ "video" ] },
+]
+
+[preview]
+# image_filter accepts: nearest | triangle | catmull-rom | gaussian | lanczos3
+image_filter = "lanczos3"
+image_quality = 75
+max_width = 600
+max_height = 900
+
+[plugin]
+# CR2 / odd-photometric TIFF -> decode via raw.yazi (dcraw + exiftool, magick for tiff).
+# Rule key is `url` (glob, case-insensitive) — NOT `name`. CR2 mime is image/x-canon-cr2.
+prepend_previewers = [
+  { url = "*.cr2", run = "raw" },
+  { mime = "image/x-canon-cr2", run = "raw" },
+  { mime = "image/tiff", run = "raw" },
+]
+prepend_preloaders = [
+  { url = "*.cr2", run = "raw" },
+  { mime = "image/x-canon-cr2", run = "raw" },
+  { mime = "image/tiff", run = "raw" },
+]
