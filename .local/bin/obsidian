@@ -1,5 +1,0 @@
-#!/usr/bin/env sh
-exec "$HOME/appimages/Obsidian-1.10.6.AppImage" \
-  --enable-features=UseOzonePlatform \
-  --ozone-platform=wayland \
-  "$@"
