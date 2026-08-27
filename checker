@@ -2,31 +2,44 @@
 set -euo pipefail
 
 tools=(
-  hyprctl
-  hyprland
-  waybar
-  mako
-  swaylock
-  wlogout
-  wofi
-  wpaperd
-  kitty
-  alacritty
-  fish
+  sway
+  swaymsg
+  swaybg
+  swayidle
+  swaynag
+  swaync
+  tofi
+  foot
+  grim
+  slurp
+  swappy
+  wl-copy
+  wpctl
+  brightnessctl
+  zsh
   tmux
+  nvim
+  yazi
+  ya
+  dcraw
+  exiftool
+  magick
   lazygit
-  lsd
+  firefox
+  delta
+  mpv
+  zathura
+  mpd
+  playerctl
+  mpDris2
+  rmpc
+  pavucontrol
+  fastfetch
   bat
+  eza
   rg
   fzf
   git
-  nvim
-  mpv
-  pavucontrol
-  yazi
-  sioyek
-  task
-  trans
 )
 
 for tool in "${tools[@]}"; do
@@ -36,3 +49,4 @@ for tool in "${tools[@]}"; do
     printf '%-16s %s\n' "$tool" "missing"
   fi
 done
+

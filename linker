@@ -60,59 +60,53 @@ prompt_yes_no() {
   done
 }
 
+# Directories that must NOT be whole-dir symlinked: the app writes runtime
+# state next to its config, and that state does not belong in this repo.
+# These are linked file-by-file instead, below.
+file_link_only=(
+  offpunk
+)
+
+is_file_link_only() {
+  local name=$1 candidate
+  for candidate in "${file_link_only[@]}"; do
+    [ "$candidate" = "$name" ] && return 0
+  done
+  return 1
+}
+
+# Tracked as reference but deliberately never linked on this host:
+#   audacious, fish, vesktop - kept per request; shell is zsh, player is rmpc
+#   swww                     - transitional dummy package on Void
+#   environment.d            - systemd-only, nothing reads it on this host
+#   waybar                   - parked; if wanted it gets reinstalled and rewritten
+#   eww                      - unported, hardcodes the old monitor name C27R50x
+never_link=(
+  audacious
+  fish
+  vesktop
+  swww
+  environment.d
+  waybar
+  eww
+)
+
+is_never_link() {
+  local name=$1 candidate
+  for candidate in "${never_link[@]}"; do
+    [ "$candidate" = "$name" ] && return 0
+  done
+  return 1
+}
+
 echo "Select configs to link from $repo_config:"
 for entry in "$repo_config"/*; do
   entry_name=$(basename "$entry")
-  case "$entry_name" in
-    fish)
-      if ! command -v fish >/dev/null 2>&1; then
-        echo "skip $entry_name (fish not installed)"
-        continue
-      fi
-      ;;
-    alacritty)
-      if ! command -v alacritty >/dev/null 2>&1; then
-        echo "skip $entry_name (alacritty not installed)"
-        continue
-      fi
-      ;;
-    kitty)
-      if ! command -v kitty >/dev/null 2>&1; then
-        echo "skip $entry_name (kitty not installed)"
-        continue
-      fi
-      ;;
-  esac
-
-  if [ "$entry_name" = "audacious" ]; then
-    src="$entry/config"
-    dest_dir="$HOME/.config/audacious"
-    dest="$dest_dir/config"
-    if [ -e "$src" ]; then
-      if prompt_yes_no "Link $src -> $dest?"; then
-        mkdir -p "$dest_dir"
-        link_path "$src" "$dest"
-      else
-        echo "skip $entry_name"
-      fi
-    else
-      echo "skip $entry_name (missing $src)"
-    fi
-    skin_src="$entry/lainampborders"
-    skin_dest="$HOME/.local/share/audacious/Skins/lainampborders"
-    if [ -d "$skin_src" ]; then
-      if prompt_yes_no "Link $skin_src -> $skin_dest?"; then
-        mkdir -p "$(dirname "$skin_dest")"
-        link_path "$skin_src" "$skin_dest"
-      else
-        echo "skip $entry_name lainampborders"
-      fi
-    else
-      echo "skip $entry_name (missing $skin_src)"
-    fi
+  is_file_link_only "$entry_name" && continue
+  if is_never_link "$entry_name"; then
+    echo "skip $entry_name (tracked as reference, not linked)"
     continue
   fi
-
   dest="$HOME/.config/$entry_name"
   if prompt_yes_no "Link $entry -> $dest?"; then
     link_path "$entry" "$dest"
@@ -121,10 +115,29 @@ for entry in "$repo_config"/*; do
   fi
 done
 
+# offpunk keeps cert_cache/ beside offpunkrc, so only the rc file is linked.
+echo "Select per-file configs to link:"
+for dir_name in "${file_link_only[@]}"; do
+  dir_src="$repo_config/$dir_name"
+  [ -d "$dir_src" ] || continue
+  for src in "$dir_src"/*; do
+    [ -e "$src" ] || continue
+    dest="$HOME/.config/$dir_name/$(basename "$src")"
+    if prompt_yes_no "Link $src -> $dest?"; then
+      mkdir -p "$HOME/.config/$dir_name"
+      link_path "$src" "$dest"
+    else
+      echo "skip $dir_name/$(basename "$src")"
+    fi
+  done
+done
+
 dotfiles=(
-  .aliases
   .profile
+  .zprofile
   .zshrc
+  .zshenv
+  .dircolors
 )
 
 echo "Select dotfiles to link into $HOME:"
@@ -140,21 +153,20 @@ for dotfile in "${dotfiles[@]}"; do
   fi
 done
 
-local_files=(
-  ".local/bin/obsidian"
-  ".local/share/applications/obsidian.desktop"
-)
+# Helper scripts that are not tied to the compositor. They live here rather
+# than in .config so they can be linked straight onto $PATH.
+repo_scripts="$script_dir/scripts"
 
-echo "Select local files to link into $HOME/.local:"
-for local_file in "${local_files[@]}"; do
-  src="$script_dir/$local_file"
-  dest="$HOME/$local_file"
-  if [ -e "$src" ]; then
+if [ -d "$repo_scripts" ]; then
+  echo "Select scripts to link into $HOME/.local/bin:"
+  mkdir -p "$HOME/.local/bin"
+  for src in "$repo_scripts"/*; do
+    [ -f "$src" ] || continue
+    dest="$HOME/.local/bin/$(basename "$src")"
     if prompt_yes_no "Link $src -> $dest?"; then
-      mkdir -p "$(dirname "$dest")"
       link_path "$src" "$dest"
     else
-      echo "skip $local_file"
+      echo "skip $(basename "$src")"
     fi
-  fi
-done
+  done
+fi

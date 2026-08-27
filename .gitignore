@@ -1,20 +1,19 @@
-.config/vesktop/sessionData/
-.config/vesktop/Crashpad/
-.config/vesktop/SingletonCookie
-.config/vesktop/SingletonLock
-.config/vesktop/SingletonSocket
-.config/vesktop/state.json
-.config/vesktop/Cache/
-.config/vesktop/Code Cache/
-.config/vesktop/GPUCache/
-.config/vesktop/blob_storage/
-.config/vesktop/Dictionaries/
-.config/vesktop/Local Storage/
-.config/vesktop/Partitions/
-.config/vesktop/Service Worker/
-.config/vesktop/Shared Dictionary/
-.config/vesktop/SharedStorage/
-.config/vesktop/Network/
-.config/vesktop/databases/
-.config/vesktop/IndexedDB/
-.config/vesktop/logs/
+*.bak-*
+.cache/
+
+# TPM is pinned to ~/.tmux/plugins, but guard against it landing here anyway
+.config/tmux/plugins/
+
+# lain flavor is a dev symlink to ~/github/lain.yazi (absolute path, host-specific)
+.config/yazi/flavors/
+
+# offpunk writes its TOFU cert store beside offpunkrc
+.config/offpunk/cert_cache/
+
+# btop regenerates its bundled themes and writes a log beside its conf
+.config/btop/themes/*
+!.config/btop/themes/lain.theme
+.config/btop/btop.log
+
+# canonical palette lives in the private repo and is symlinked in
+lain-colors.md
