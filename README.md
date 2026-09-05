@@ -1,5 +1,10 @@
 # lainsway
 
+> [!NOTE]
+> **Archived.** Everything here has moved to
+> [lainland](https://github.com/identityapproved/lainland), one dotfiles repo
+> covering every host. This repo stays read-only for history.
+
 Personal Sway rice for a Void Linux laptop, in the *Serial Experiments Lain*
 palette (rose `#CE7688`, ochre `#C1B48E`, black `#000000`).
 
